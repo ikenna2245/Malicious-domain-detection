@@ -1,0 +1,283 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Scan URLs</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <img class="navbar-brand" height=150 src="https://wp.inews.co.uk/wp-content/uploads/2022/08/SEI_120609861.jpg?resize=1200,675&strip=all&quality=90" alt="Medusa">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
+                </li>
+              
+                <li class="nav-item">
+                    <a class="nav-link" href="#11">Notebooks</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#12">Paper</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="jumbotron">
+        <h1 class="display-4">Project Medusa</h1> 
+        <p class="lead">This platform uses machine learning technique to validate URL as well as check with thirdparty
+            APIs. </p>
+        <hr class="my-4">
+        <p>Multiple features are generated from the URL and used to make classification of the URL if it is malicious or
+            benign. Several ML models has been trained and ensembled to create a novel technology for idenfiying
+            malicious URLs.
+        </p>
+        <p class="lead">
+            <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+        </p>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h3 class="thead-light"> Validate Your URL Here</h3>
+            </div>
+        </div>
+    </div>
+    <div class="container mt-4 mb-4">
+        <div class="row">
+            <div class="col">
+                <form method="post" action="{% url 'url_validator' %}">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="col">
+                            <input type="text" name='url' required class="form-control" placeholder="Enter URL">
+                        </div>
+                    </div>
+                    <button type="submit" name="button" class="btn btn-primary mt-4 mb-4">Scan URL</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class = 'container'>
+        <h3> {{  url }}
+    </div>
+
+    <div class="container mt-4 mb-4">
+        <div class="row">
+                {% if prediction == 1 %}
+                    <div class="col">
+                        <div class="alert alert-danger" role="alert">
+                            This URL has been classified as MALICIOUS
+                        </div>
+                    </div>
+                {% endif %}
+                {% if prediction == 0 %}
+                    <div class="col" >
+                        <div class="alert alert-success" role="alert">
+                            This URL has been classified as SAFE (BENIGN)
+                        </div>
+                    </div>
+                {% endif %}
+        </div>
+    </div> 
+    <div class="container  overflow-auto" height    = '700px'>
+        <div class="row">
+            <div class="col">
+                <h3 class="thead-light mb-4 mt-4"> URL Lexical Features</h3>
+                <table class="table">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">Params</th>
+                            <th scope="col">Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">HTTP Secure</th>
+                            <td>{% if https %} Yes {% else %} No {% endif %}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">digits count</th>
+                            <td>{{ digits  }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Letters count</th>
+                            <td>{{ letters }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">URL length</th>
+                            <td>{{ url_len }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Subdomain length</th>
+                            <td> {{ len_subdomain }} </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Subdomain present</th>
+                            <td>{% if is_subdomain %} Yes {% elif not is_subdomain %} No {% endif %} </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Shortining Service</th>
+                            <td> {% if Shortining_Service %} Yes {% elif not Shortining_Service %} No {% endif %}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">'having_ip_address </th>
+                            <td> {% if having_ip_address %} Yes {% elif not having_ip_address %} No {% endif %}  </td>
+                        </tr>
+                        <tr> 
+                            <th scope="row">TLD  </th>
+                            <td> {{ tld }} </td>
+                        </tr>
+                        
+
+                        
+                    </tbody>
+                </table>
+            </div>
+            <div class="col">
+                <h3 class="thead-light mb-4 mt-4"> PageSpeed Insight API</h3>
+                <table class="table">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">Params</th>
+                            <th scope="col">Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row"> observedFirstPaint</th>
+                            <td>{{ pm0 }}</td> 
+                        </tr>
+                        <tr>
+                            <th scope="row"> firstContentfulPaint</th>
+                            <td>{{ pm1 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> observedFirstContentfulPaint</th>
+                            <td>{{ pm2 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> firstMeaningfulPaint</th>
+                            <td>{{ pm3 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> observedFirstMeaningfulPaint</th>
+                            <td>{{ pm4 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> cumulativeLayoutShift</th>
+                            <td>{{ pm5 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> observedCumulativeLayoutShift</th>
+                            <td>{{ pm6 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> cumulativeLayoutShiftMainFrame</th>
+                            <td>{{ pm7 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> observedCumulativeLayoutShiftMainFrame</th>
+                            <td>{{ pm8 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> totalCumulativeLayoutShift</th>
+                            <td>{{ pm9 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> observedTotalCumulativeLayoutShift</th>
+                            <td>{{ pm10 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> interactive </th>
+                            <td>{{ pm11 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> observedDomContentLoaded </th>
+                            <td>{{ pm12 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> largestContentfulPaint </th>
+                            <td>{{ pm13 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> observedLargestContentfulPaint </th>
+                            <td>{{ pm14 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> observedLoad </th>
+                            <td>{{ pm15 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> totalBlockingTime </th>
+                            <td>{{ pm16 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> ospeedIndex </th>
+                            <td>{{ pm17 }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row"> observedSpeedIndex </th>
+                            <td>{{ pm18 }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class='container'> 
+        <h2 id='11' class='mb-4 mt-4'> 1.0 The Python Notebook </h2>
+
+        <ul class="list-group mt-4 mb-4">
+            <li class="list-group-item"><a href='https://github.com/ikenna2245/Malicious-domain-detection/blob/main/lexical%20feature%20generation%20-%20Notebook%201.ipynb'> 
+                Notebook 1 - EDA and Features Extraction</a></li>
+            <li class="list-group-item"><a href='https://github.com/ikenna2245/Malicious-domain-detection/blob/main/lexical%20features%20-%20Notebook%202.ipynb'> 
+                Notebook 2 - Lexical feature generation and training</a></li>
+            <li class="list-group-item"><a href='https://github.com/ikenna2245/Malicious-domain-detection/blob/main/A0220767%20-%20Ikenna%20Miracle%20Umeh%20-%20Notebook%203.ipynb'>
+                 Notebook 3 - Lexical Model training</a></li>
+            <li class="list-group-item"><a href='https://github.com/ikenna2245/Malicious-domain-detection/blob/main/A0220767%20-%20Ikenna%20Miracle%20Umeh%20-%20Notebook%204.ipynb'> 
+                Notebook 4 - TFIDF Model Training </a></li>
+            <li class="list-group-item"><a href='https://github.com/ikenna2245/Malicious-domain-detection/blob/main/A0220767%20-%20Ikenna%20Miracle%20Umeh%20-%20Notebook%205.ipynb'> 
+                Notebook 5 - Performance Metrics and Model training </a></li>
+            <li class="list-group-item"><a href='https://github.com/ikenna2245/Malicious-domain-detection/blob/main/A0220767%20-%20Ikenna%20Miracle%20Umeh%20-%20Notebook%206.ipynb'> Notebook 6 - Ensembling </a> </li>
+          </ul>
+    </div>
+
+   
+    <div class="container">
+        <h2 id= '12' class='mb-4 mt-4'> 2.0 The Research Paper </h2>
+        <h4 class='mb-4'>Title: Identifying Malicious Web Domains using Ensemble Machine Learning Method from multiple feature generation</h4>
+        <iframe src="{% static 'url/project.pdf' %}" width="100%" height="700px">
+
+        </iframe>
+    </div>
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
